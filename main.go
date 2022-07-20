@@ -3,6 +3,8 @@ package main
 import (
 	"OrderMgmt/controllers"
 	"OrderMgmt/initializers"
+
+	// "OrderMgmt/models"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -22,10 +24,16 @@ func init() {
 }
 
 func main() {
+
+	// initializers.DB.Migrator().DropTable(&models.Customer{})
+	// initializers.DB.Migrator().DropTable(&models.Order{})
+	// initializers.DB.Migrator().DropTable(&models.ProductOrder{})
+	// initializers.DB.Migrator().DropTable(&models.Product{})
 	fmt.Println("Build Done")
 	r := gin.Default()
 
 	r.POST("/", controllers.CreateProduct)
+	r.GET("/", controllers.ReadAllProducts)
 	r.Run()
 
 }

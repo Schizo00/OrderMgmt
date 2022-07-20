@@ -3,7 +3,6 @@ package controllers
 import (
 	"OrderMgmt/initializers"
 	"OrderMgmt/models"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,7 +25,17 @@ func CreateProduct(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"Product": temp_product,
+	c.JSON(200, gin.H{
+		"Product Name": product.Name,
+	})
+}
+
+func ReadAllProducts(c *gin.Context) {
+	//var records []models.Product
+	var product models.Product
+	initializers.DB.First(&product, 1)
+
+	c.JSON(200, gin.H{
+		"Product": product,
 	})
 }

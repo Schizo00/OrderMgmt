@@ -4,7 +4,8 @@ import "gorm.io/gorm"
 
 type Order struct {
 	gorm.Model
-	Order_ID    uint
-	Customer_ID uint
-	Total       uint
+	ID         uint
+	Customer   Customer `gorm:"foreignKey:CustomerID; references:ID"`
+	CustomerID uint
+	Total      uint
 }
