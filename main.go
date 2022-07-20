@@ -33,7 +33,8 @@ func main() {
 	r := gin.Default()
 
 	r.POST("/", controllers.CreateProduct)
-	r.GET("/", controllers.ReadAllProducts)
+	r.GET("/", controllers.RetrieveAllProducts)
+	r.GET("/:index", controllers.RetrieveProductByIndex)
 	r.Run()
 
 }

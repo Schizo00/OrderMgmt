@@ -11,7 +11,7 @@ var DB *gorm.DB
 
 func ConnectToDB() {
 	var err error
-	dsn := "root@tcp(127.0.0.1:3306)/ordermgmt"
+	dsn := "root@tcp(127.0.0.1:3306)/ordermgmt?parseTime=true"
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	// var err error
 	// dsn := os.Getenv("DB_STRING")
