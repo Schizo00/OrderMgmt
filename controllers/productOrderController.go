@@ -11,20 +11,30 @@ import (
 func CreateProductOrder(c *gin.Context) {
 
 	var productOrder struct {
-		OrderID   int
-		Quantity  int
+		OrderID   int `json:"OrderID"`
+		Quantity  int `json:"Quantity"`
 		Order     models.Order
 		Product   models.Product
-		ProductID int
-		Price     int
-		SubTotal  int
+		ProductID int `json:"ProductId"`
+		Price     int `json:"Price"`
+		SubTotal  int `json:"SubTotal"`
 	}
 
 	c.Bind(&productOrder)
+	fmt.Println("OrderID", productOrder.OrderID)
+	var temp_product models.Product
+	initializers.DB.First(&temp_product, productOrder.ProductID)
 
-	temp_product := models.ProductOrder{OrderID: productOrder.OrderID, Quantity: productOrder.Quantity, Price: productOrder.Price, SubTotal: productOrder.SubTotal, ProductID: productOrder.ProductID, Product: productOrder.Product}
+	temp_productOrder := models.ProductOrder{
+		OrderID:   productOrder.OrderID,
+		Quantity:  productOrder.Quantity,
+		ProductID: productOrder.ProductID,
+		Product:   productOrder.Product,
+		Price:     temp_product.Price,
+		SubTotal:  temp_product.Price * productOrder.Quantity,
+	}
 
-	result := initializers.DB.Create(&temp_product)
+	result := initializers.DB.Create(&temp_productOrder)
 
 	if result.Error != nil {
 		c.Status(400)
@@ -59,34 +69,49 @@ func RetrieveProductOrderByIndex(c *gin.Context) {
 
 func UpdateProductOrderByIndex(c *gin.Context) {
 	var productOrder models.ProductOrder
-	var userInput models.ProductOrder
+
+	var userInput struct {
+		OrderID   int `json:"OrderID"`
+		Quantity  int `json:"Quantity"`
+		Order     models.Order
+		Product   models.Product
+		ProductID int `json:"ProductId"`
+		Price     int `json:"Price"`
+		SubTotal  int `json:"SubTotal"`
+	}
+
 	c.Bind(&userInput)
 
 	index := c.Param("index")
 	initializers.DB.First(&productOrder, index)
+
 	if userInput.OrderID != 0 {
-		initializers.DB.Model(&productOrder).Update("OrderD", userInput.OrderID)
+		initializers.DB.Model(&productOrder).Update(models.ProductOrder{OrderID: userInput.OrderID})
 	}
 
 	if userInput.ProductID != 0 {
-		initializers.DB.Model(&productOrder).Update("ProductID", userInput.ProductID)
+		initializers.DB.Model(&productOrder).Update(models.ProductOrder{ProductID: userInput.ProductID})
 	}
 
 	if userInput.Quantity != 0 {
-		initializers.DB.Model(&productOrder).Update("Quantity", userInput.Quantity)
+		initializers.DB.Model(&productOrder).Update(models.ProductOrder{Quantity: userInput.Quantity})
 	}
 
+	var temp_product models.Product
+	initializers.DB.Find(&temp_product, productOrder.ProductID)
+
 	if userInput.Price != 0 {
-		initializers.DB.Model(&productOrder).Update("Price", userInput.Price)
+		initializers.DB.Model(&productOrder).Update(models.ProductOrder{Price: temp_product.Price})
 	}
 
 	if userInput.SubTotal != 0 {
-		initializers.DB.Model(&productOrder).Update("SubTotal", userInput.SubTotal)
+		initializers.DB.Model(&productOrder).Update(models.ProductOrder{SubTotal: temp_product.Price * productOrder.Quantity})
 	}
 
 	c.JSON(200, gin.H{
 		"ProductOrder": productOrder,
 	})
+
 }
 
 func DeleteProductOrderByIndex(c *gin.Context) {

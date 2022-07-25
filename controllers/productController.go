@@ -11,8 +11,8 @@ import (
 func CreateProduct(c *gin.Context) {
 
 	var product struct {
-		Name          string
-		Price         int
+		Name          string `json:"Name"`
+		Price         int    `json:"Price"`
 		ProductOrders []models.ProductOrder
 	}
 
@@ -55,17 +55,21 @@ func RetrieveProductByIndex(c *gin.Context) {
 
 func UpdateProductByIndex(c *gin.Context) {
 	var product models.Product
-	var userInput models.Product
+	var userInput struct {
+		Name          string `json:"Name"`
+		Price         int    `json:"Price"`
+		ProductOrders []models.ProductOrder
+	}
 	c.Bind(&userInput)
 
 	index := c.Param("index")
 	initializers.DB.First(&product, index)
-	if userInput.ProductID != 0 {
-		initializers.DB.Model(&product).Update("ProductID", userInput.ProductID)
+	if userInput.Name != "" {
+		initializers.DB.Model(&product).Update(models.Product{Name: userInput.Name})
 	}
 
 	if userInput.Price != 0 {
-		initializers.DB.Model(&product).Update("Price", userInput.Price)
+		initializers.DB.Model(&product).Update(models.Product{Price: userInput.Price})
 	}
 
 	c.JSON(200, gin.H{

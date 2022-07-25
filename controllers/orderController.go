@@ -11,14 +11,14 @@ import (
 func CreateOrder(c *gin.Context) {
 
 	var order struct {
-		CustId        int
+		CustID        int `json:"CustID"`
 		ProductOrders []models.ProductOrder
-		Total         int
+		Total         int `json:"Total"`
 	}
 
 	c.Bind(&order)
-
-	temp_order := models.Order{CustID: order.CustId, ProductOrders: order.ProductOrders, Total: order.Total}
+	//
+	temp_order := models.Order{CustID: order.CustID, ProductOrders: order.ProductOrders}
 
 	result := initializers.DB.Create(&temp_order)
 
@@ -28,7 +28,7 @@ func CreateOrder(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"Customer ID": order.CustId,
+		"Customer ID": order.CustID,
 		"Total":       order.Total,
 	})
 }
@@ -55,18 +55,28 @@ func RetrieveOrderByIndex(c *gin.Context) {
 
 func UpdateOrderByIndex(c *gin.Context) {
 	var order models.Order
-	var userInput models.Order
+	var userInput struct {
+		CustID        int `json:"CustID"`
+		ProductOrders []models.ProductOrder
+		Total         int `json:"Total"`
+	}
 	c.Bind(&userInput)
+
+	fmt.Println(userInput, "User null")
 
 	index := c.Param("index")
 	initializers.DB.First(&order, index)
 	if userInput.CustID != 0 {
-		initializers.DB.Model(&order).Update("CustD", userInput.CustID)
+		initializers.DB.Model(&order).Update(models.Order{CustID: userInput.CustID})
 	}
 
 	if userInput.Total != 0 {
-		initializers.DB.Model(&order).Update("Price", userInput.Total)
+		initializers.DB.Model(&order).Update(models.Order{Total: userInput.Total})
 	}
+
+	c.JSON(200, gin.H{
+		"UserOrder": userInput,
+	})
 
 	c.JSON(200, gin.H{
 		"Order": order,
