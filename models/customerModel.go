@@ -1,10 +1,8 @@
 package models
 
-import "gorm.io/gorm"
-
 type Customer struct {
-	gorm.Model
-	ID    uint
-	Name  string
-	Email string
+	CustID int `gorm:"primary_key; auto_increment; not null; unique"`
+	Name   string
+	Email  string
+	Orders []Order `gorm:"ForeignKey:CustID"`
 }

@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
+	"github.com/jinzhu/gorm"
 )
 
 type Product struct {
@@ -32,9 +32,29 @@ func main() {
 	fmt.Println("Build Done")
 	r := gin.Default()
 
-	r.POST("/", controllers.CreateProduct)
-	r.GET("/", controllers.RetrieveAllProducts)
-	r.GET("/:index", controllers.RetrieveProductByIndex)
+	r.POST("/products/create", controllers.CreateProduct)
+	r.GET("/products/retrieve", controllers.RetrieveAllProducts)
+	r.GET("products/retrieve/:index", controllers.RetrieveProductByIndex)
+	r.PUT("products/update/:index", controllers.UpdateProductByIndex)
+	r.DELETE("products/delete/:index", controllers.DeleteProductByIndex)
+
+	r.POST("/orders/create", controllers.CreateOrder)
+	r.GET("/orders/retrieve", controllers.RetrieveAllOrders)
+	r.GET("/orders/retrieve/:index", controllers.RetrieveOrderByIndex)
+	r.PUT("/orders/update/:index", controllers.UpdateOrderByIndex)
+	r.DELETE("/orders/delete/:index", controllers.DeleteOrderByIndex)
+
+	r.POST("/customers/create", controllers.CreateCustomer)
+	r.GET("/customers/retrieve", controllers.RetrieveAllCustomers)
+	r.GET("/customers/retrieve/:index", controllers.RetrieveCustomerByIndex)
+	r.PUT("/customers/update/:index", controllers.UpdateCustomerByIndex)
+	r.DELETE("/customers/delete/:index", controllers.DeleteCustomerByIndex)
+
+	r.POST("/productorder/create", controllers.CreateProductOrder)
+	r.GET("/productorder/retrieve", controllers.RetrieveAllProductOrders)
+	r.GET("/productorder/retrieve/:index", controllers.RetrieveProductOrderByIndex)
+	r.PUT("/productorder/update/:index", controllers.UpdateProductOrderByIndex)
+	r.DELETE("/productorder/delete/:index", controllers.DeleteProductOrderByIndex)
 	r.Run()
 
 }

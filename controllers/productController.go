@@ -11,13 +11,14 @@ import (
 func CreateProduct(c *gin.Context) {
 
 	var product struct {
-		Name  string
-		Price uint
+		Name          string
+		Price         int
+		ProductOrders []models.ProductOrder
 	}
 
 	c.Bind(&product)
 
-	temp_product := models.Product{Name: product.Name, Price: product.Price}
+	temp_product := models.Product{Name: product.Name, Price: product.Price, ProductOrders: product.ProductOrders}
 
 	result := initializers.DB.Create(&temp_product)
 
@@ -50,4 +51,31 @@ func RetrieveProductByIndex(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"Product": product,
 	})
+}
+
+func UpdateProductByIndex(c *gin.Context) {
+	var product models.Product
+	var userInput models.Product
+	c.Bind(&userInput)
+
+	index := c.Param("index")
+	initializers.DB.First(&product, index)
+	if userInput.ProductID != 0 {
+		initializers.DB.Model(&product).Update("ProductID", userInput.ProductID)
+	}
+
+	if userInput.Price != 0 {
+		initializers.DB.Model(&product).Update("Price", userInput.Price)
+	}
+
+	c.JSON(200, gin.H{
+		"Product": product,
+	})
+}
+
+func DeleteProductByIndex(c *gin.Context) {
+	index := c.Param("index")
+	initializers.DB.Delete(&models.Product{}, index)
+	fmt.Println(index)
+	c.Status(200)
 }
