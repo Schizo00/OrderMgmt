@@ -38,9 +38,7 @@ func RetrieveAllCustomers(c *gin.Context) {
 	var customers []models.Customer
 	initializers.DB.Find(&customers)
 
-	c.JSON(200, gin.H{
-		"Customers": customers,
-	})
+	c.JSON(200, customers)
 }
 
 func RetrieveCustomerByIndex(c *gin.Context) {

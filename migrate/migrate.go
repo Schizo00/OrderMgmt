@@ -11,12 +11,19 @@ func init() {
 }
 
 func main() {
+
+	// initializers.DB.Migrator().DropTable(&models.Customer{})
+	// initializers.DB.Migrator().DropTable(&models.Order{})
+	// initializers.DB.Migrator().DropTable(&models.ProductOrder{})
+	// initializers.DB.Migrator().DropTable(&models.Product{})
+
 	initializers.DB.DropTableIfExists(&models.Customer{}, &models.Product{}, &models.Order{}, &models.ProductOrder{})
 	initializers.DB.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&models.Customer{}, &models.Product{}, &models.Order{}, &models.ProductOrder{})
 
 	initializers.DB.Model(&models.Order{}).AddForeignKey("cust_id", "customers(cust_id)", "CASCADE", "CASCADE")
 	initializers.DB.Model(&models.ProductOrder{}).AddForeignKey("order_id", "orders(order_id)", "CASCADE", "CASCADE")
 	initializers.DB.Model(&models.ProductOrder{}).AddForeignKey("product_id", "products(product_id)", "CASCADE", "CASCADE")
+
 	// initializers.DB.Migrator().CreateConstraint(&models.Customer{}, "orders")
 	// initializers.DB.Migrator().CreateConstraint(&models.Customer{}, "fk_orders_customers")
 

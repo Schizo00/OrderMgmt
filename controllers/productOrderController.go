@@ -33,7 +33,6 @@ func CreateProductOrder(c *gin.Context) {
 		Price:     temp_product.Price,
 		SubTotal:  temp_product.Price * productOrder.Quantity,
 	}
-
 	result := initializers.DB.Create(&temp_productOrder)
 
 	if result.Error != nil {
@@ -45,19 +44,25 @@ func CreateProductOrder(c *gin.Context) {
 		"Product Quantity": productOrder.Quantity,
 		"Product Price":    productOrder.Price,
 	})
+
+	refreshTotals()
 }
 
 func RetrieveAllProductOrders(c *gin.Context) {
+
+	refreshTotals()
+
 	//var records []models.Product
 	var productOrders []models.ProductOrder
 	initializers.DB.Find(&productOrders)
 
-	c.JSON(200, gin.H{
-		"Products": productOrders,
-	})
+	c.JSON(200, productOrders)
 }
 
 func RetrieveProductOrderByIndex(c *gin.Context) {
+
+	refreshTotals()
+
 	var productOrder models.Product
 	index := c.Param("index")
 	initializers.DB.Find(&productOrder, index)
@@ -85,6 +90,7 @@ func UpdateProductOrderByIndex(c *gin.Context) {
 	index := c.Param("index")
 	initializers.DB.First(&productOrder, index)
 
+	fmt.Println("INDEX: ", index)
 	if userInput.OrderID != 0 {
 		initializers.DB.Model(&productOrder).Update(models.ProductOrder{OrderID: userInput.OrderID})
 	}
@@ -100,23 +106,27 @@ func UpdateProductOrderByIndex(c *gin.Context) {
 	var temp_product models.Product
 	initializers.DB.Find(&temp_product, productOrder.ProductID)
 
-	if userInput.Price != 0 {
-		initializers.DB.Model(&productOrder).Update(models.ProductOrder{Price: temp_product.Price})
-	}
-
-	if userInput.SubTotal != 0 {
-		initializers.DB.Model(&productOrder).Update(models.ProductOrder{SubTotal: temp_product.Price * productOrder.Quantity})
-	}
+	initializers.DB.Model(&productOrder).Update(models.ProductOrder{Price: temp_product.Price})
+	initializers.DB.Model(&productOrder).Update(models.ProductOrder{SubTotal: temp_product.Price * productOrder.Quantity})
 
 	c.JSON(200, gin.H{
-		"ProductOrder": productOrder,
+		"Order": 1,
 	})
+
+	refreshTotals()
 
 }
 
 func DeleteProductOrderByIndex(c *gin.Context) {
 	index := c.Param("index")
+	var productOrder models.ProductOrder
+	initializers.DB.First(&productOrder, index)
 	initializers.DB.Delete(&models.ProductOrder{}, index)
+	c.JSON(200, gin.H{
+		"Order": 1,
+	})
 	fmt.Println(index)
 	c.Status(200)
+
+	refreshTotals()
 }

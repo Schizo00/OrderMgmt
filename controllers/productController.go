@@ -18,6 +18,8 @@ func CreateProduct(c *gin.Context) {
 
 	c.Bind(&product)
 
+	fmt.Println("PRODUCT: ", product)
+
 	temp_product := models.Product{Name: product.Name, Price: product.Price, ProductOrders: product.ProductOrders}
 
 	result := initializers.DB.Create(&temp_product)
@@ -35,12 +37,10 @@ func CreateProduct(c *gin.Context) {
 
 func RetrieveAllProducts(c *gin.Context) {
 	//var records []models.Product
-	var product []models.Product
-	initializers.DB.First(&product, 1)
+	var products []models.Product
+	initializers.DB.Find(&products)
 
-	c.JSON(200, gin.H{
-		"Products": product,
-	})
+	c.JSON(200, products)
 }
 
 func RetrieveProductByIndex(c *gin.Context) {
@@ -48,9 +48,8 @@ func RetrieveProductByIndex(c *gin.Context) {
 	index := c.Param("index")
 	initializers.DB.Find(&product, index)
 	fmt.Println(index)
-	c.JSON(200, gin.H{
-		"Product": product,
-	})
+	c.JSON(200, product)
+
 }
 
 func UpdateProductByIndex(c *gin.Context) {
@@ -72,9 +71,7 @@ func UpdateProductByIndex(c *gin.Context) {
 		initializers.DB.Model(&product).Update(models.Product{Price: userInput.Price})
 	}
 
-	c.JSON(200, gin.H{
-		"Product": product,
-	})
+	c.JSON(200, product)
 }
 
 func DeleteProductByIndex(c *gin.Context) {
@@ -82,4 +79,10 @@ func DeleteProductByIndex(c *gin.Context) {
 	initializers.DB.Delete(&models.Product{}, index)
 	fmt.Println(index)
 	c.Status(200)
+}
+
+func Ping(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"Hello": "Endpoint Pinged",
+	})
 }
