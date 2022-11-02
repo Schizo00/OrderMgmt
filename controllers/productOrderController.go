@@ -63,13 +63,11 @@ func RetrieveProductOrderByIndex(c *gin.Context) {
 
 	refreshTotals()
 
-	var productOrder models.Product
+	var productOrder models.ProductOrder
 	index := c.Param("index")
 	initializers.DB.Find(&productOrder, index)
 	fmt.Println(index)
-	c.JSON(200, gin.H{
-		"ProductOrder": productOrder,
-	})
+	c.JSON(200, productOrder)
 }
 
 func UpdateProductOrderByIndex(c *gin.Context) {
@@ -113,6 +111,7 @@ func UpdateProductOrderByIndex(c *gin.Context) {
 		"Order": 1,
 	})
 
+	fmt.Println("INSIDE UPDATE FUNC")
 	refreshTotals()
 
 }

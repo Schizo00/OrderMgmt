@@ -56,9 +56,9 @@ func RetrieveOrderByIndex(c *gin.Context) {
 	index := c.Param("index")
 	initializers.DB.Find(&order, index)
 	fmt.Println(index)
-	c.JSON(200, gin.H{
-		"ProductID": order,
-	})
+	c.JSON(200, order)
+
+	refreshTotals()
 }
 
 func UpdateOrderByIndex(c *gin.Context) {
@@ -78,14 +78,6 @@ func UpdateOrderByIndex(c *gin.Context) {
 		initializers.DB.Model(&order).Update(models.Order{CustID: userInput.CustID})
 	}
 
-	c.JSON(200, gin.H{
-		"UserOrder": userInput,
-	})
-
-	c.JSON(200, gin.H{
-		"Order": order,
-	})
-
 	refreshTotals()
 
 }
@@ -102,24 +94,35 @@ func DeleteOrderByIndex(c *gin.Context) {
 
 }
 
-// func CalculateTotalPrice(prodOrderPrice int, index int, c *gin.Context) int {
-// 	var temp_all_orders []models.ProductOrder
-// 	//initializers.DB.Find(&temp_all_orders, index)
-// 	initializers.DB.Raw("SELECT * FROM product_orders WHERE order_id = ?", index).Scan(&temp_all_orders)
-// 	temp_total_price := prodOrderPrice
-
-// 	for i := 0; i < len(temp_all_orders); i++ {
-// 		temp_total_price = temp_total_price + temp_all_orders[i].SubTotal
-// 	}
-
-// 	c.JSON(200, gin.H{
-// 		"NO OF ELEMENTS": len(temp_all_orders),
-// 	})
-
-// 	return temp_total_price
-// }
-
 func refreshTotals() {
+	var prod_orders []models.ProductOrder
+	initializers.DB.Find(&prod_orders)
+
+	var orders []models.Order
+	initializers.DB.Find(&orders)
+
+	for i := 0; i < len(orders); i++ {
+		initializers.DB.Model(&orders[i]).Update("Total", 0)
+	}
+
+	for i := 0; i < len(prod_orders); i++ {
+		var order models.Order
+		initializers.DB.First(&order, prod_orders[i].OrderID)
+
+		temp_total := order.Total + prod_orders[i].SubTotal
+		fmt.Println("SUBTOTAL: ", temp_total)
+		fmt.Println("PROD ORDER: ", prod_orders[i].OrderID)
+
+		initializers.DB.Model(&order).Update("Total", temp_total)
+		fmt.Println("ORDER ID: ", order.OrderID)
+
+	}
+
+	fmt.Println("INSIDE REFRESH TOTALS FUNC")
+
+}
+
+func RefreshTotal(c *gin.Context) {
 	var prod_orders []models.ProductOrder
 	initializers.DB.Find(&prod_orders)
 
@@ -140,5 +143,11 @@ func refreshTotals() {
 		initializers.DB.Model(&orders[i]).Update("Total", temp_total)
 
 	}
+
+	fmt.Println("INSIDE REFRESH TOTALS FUNC")
+
+	c.JSON(200, gin.H{
+		"HI": "Done",
+	})
 
 }

@@ -57,6 +57,8 @@ func main() {
 		api.PUT("/productorders/update/:index", controllers.UpdateProductOrderByIndex)
 		api.DELETE("/productorders/delete/:index", controllers.DeleteProductOrderByIndex)
 
+		api.GET("/refresh", controllers.RefreshTotal)
+
 	}
 
 	r.Run()
